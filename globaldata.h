@@ -16,6 +16,15 @@
 #define p2 300
 #define p3 500
 
+
+enum calibrationModel{
+    normal_model,        //正常模式
+    offset_model,        //offset标定
+    test_model,          //第一次复测
+    test_2_model,        //第二次复测
+    manual_test_model    //手动测试
+};
+
 struct Settings {
     QString name;
     qint32 baudRate;

@@ -37,6 +37,9 @@ public:
     float MM_mean,MM_std;
     float MaiKuan_mean;
 
+
+    //标定距离
+    int  calibrationDistance;
 private slots:
 
     void Disploy_log(QString);

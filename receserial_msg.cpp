@@ -65,7 +65,18 @@ receSerial_msg::receSerial_msg(QObject *parent) : QObject(parent)
     qDebug()<<"A1="<<A1_<<" B1="<<B1_<<" C1="<<" tofThreadhold ="<<peakThreshold_<<C1_<<" P1="<<D1_<<" P2="<<E1_<<" OFFSET="<<offset_;
 
 
-    statisticPoint_number = 35;
+
+    statisticPoint_number = paraSetting.value("Statistic/statisticPoint_number").toString().toInt();
+    if(statisticPoint_number <= 0)
+    {
+        statisticPoint_number = 35;
+        paraSetting.setValue("Statistic/statisticPoint_number",QString::number(statisticPoint_number));
+    }
+
+
+
+
+
 }
 
 void receSerial_msg::openOrCloseSerial_slot(bool flag)
@@ -119,7 +130,7 @@ void receSerial_msg::readDataSlot()
     {
         strHex = temp.toHex();
         strHex = strHex.toUpper();
-        qDebug()<<" strHex = "<<strHex;
+//        qDebug()<<" strHex = "<<strHex;
         //        return;
 
         m_buffer.append(strHex);
@@ -188,6 +199,23 @@ void receSerial_msg::readDataSlot()
                     }
                 }
 
+                //
+                if("81" == returnCmdStr)
+                {
+                    QString secCmd =single_Data.mid(8,2);
+                    if("71" == secCmd)
+                    {
+                        QString cmdAck = "8171";
+                        QString dataStr = single_Data.mid(10,dataLen);
+                        emit AckCmd_MainWindow_signal(cmdAck,dataStr);
+                    }
+
+
+                }
+
+
+
+
                 //              初始化（设备自检）命令  的返回命令
                 if("81" == returnCmdStr)
                 {
@@ -225,7 +253,7 @@ void receSerial_msg::readDataSlot()
                     }
                 }
 
-                //              下载测试固件命令  的返回命令
+                //              下载测试固件1命令  的返回命令
                 if("81" == returnCmdStr)
                 {
                     QString secCmd = single_Data.mid(8,2);
@@ -264,11 +292,49 @@ void receSerial_msg::readDataSlot()
 
                 }
 
+
+                //断电重启成功的返回命令
+                if("81"==returnCmdStr)
+                {
+                    QString secCmd = single_Data.mid(8,2);
+                    if("86" == secCmd)
+                    {
+                        QString cmdAck = "8186";
+                        QString dataStr = single_Data.mid(10,dataLen);
+                        emit AckCmd_MainWindow_signal(cmdAck,dataStr);
+                    }
+                }
+
+                // offset 写入命令后的返回命令
+                if("81" == returnCmdStr)
+                {
+                    QString secCmd = single_Data.mid(8,2);
+                    if("87"== secCmd)
+                    {
+                        QString cmdAck = "8187";
+                        QString dataStr = single_Data.mid(10,dataLen);
+                        emit AckCmd_MainWindow_signal(cmdAck,dataStr);
+                    }
+                }
+
+                //下载测距固件2 的返回命令
+                if("81" == returnCmdStr)
+                {
+                    QString secCmd = single_Data.mid(8,2);
+                    if("88" == secCmd)
+                    {
+                        QString cmdAck = "8188";
+                        QString dataStr = single_Data.mid(10,dataLen);
+                        emit AckCmd_MainWindow_signal(cmdAck,dataStr);
+                    }
+                }
+
+
                 //  开始测距命令  连续测量的返回命令
                 if("81" == returnCmdStr)
                 {
 
-                    qDebug()<<"singleData = "<<single_Data;
+//                    qDebug()<<"singleData = "<<single_Data;
                     QString secCmd = single_Data.mid(8,2);
                     if("84" == secCmd)
                     {
@@ -290,7 +356,8 @@ void receSerial_msg::readDataSlot()
 
                         float MaiKuan_float = 0;
 
-                        //16进制数据转化为10进制 然后再转化成字符串   2Byte-LSB  2BYte-mm 4byte-peak  2byte-noiseLevel 2byte-refernceLSB 2byte-referenceMM
+
+                        //2个字节的 tof 4个字节的peak  2个字节的脉宽
                         for(int i=0; i<dataLen; i+=16)    //6个字节  2个字节mm  4个字节peak
                         {
                             pointNum++;
@@ -421,7 +488,7 @@ void receSerial_msg::readDataSlot()
 
 
                                 int len = StatisticPeak_vector.size();
-                                if(len>=35)
+                                if(len>=statisticPoint_number)
                                 {
                                     isSaveFlag = false;   //停止存储
                                     emit toSendStatistic_signal(saveDistance,StatisticLSB_vector,StatisticMM_vector,StatisticPeak_vector,Statistic_decetionRate_vector);
