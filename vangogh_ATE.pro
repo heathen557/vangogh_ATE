@@ -8,7 +8,7 @@ QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport texttospeech
 
-TARGET = Vi5300_ATE_V3.0_20201126
+TARGET = Vi5300_ATE_V3.1_20201127
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use

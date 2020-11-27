@@ -64,6 +64,11 @@ private slots:
 
     void on_readModuleNum_pushButton_clicked();
 
+
+    void on_set_SteelDistance_pushButton_clicked();
+
+    void on_manual_getData_pushButton_clicked();
+
 signals:
     void openOrCloseSerial_signal(bool);
 

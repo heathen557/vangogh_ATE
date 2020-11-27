@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     isLinked = true;
 
-    ui->groupBox_9->setVisible(false);
+//    ui->groupBox_9->setVisible(false);
 
     qRegisterMetaType<vector<float>>("vector<float>");   //注册函数
     qRegisterMetaType<vector<double>>("vector<double>");   //注册函数
@@ -363,12 +363,20 @@ void MainWindow::AckCmd_MainWindow_slot(QString returnCmd,QString AckInfo)
         }
     }else if("8171" == returnCmd)
     {
-        QString strMsg = QStringLiteral("PLC已经到达位置，下一步开启RCO标定！")+QString::number(calibrationDistance)+"mm";
-        Disploy_log(strMsg);
+        if(calibration_model == normal_model)   //正常工作模式下
+        {
+            QString strMsg = QStringLiteral("PLC已经到达位置，下一步开启RCO标定！")+QString::number(calibrationDistance)+"mm";
+            Disploy_log(strMsg);
 
-        QString cmdStr = "5A 01 00 00 81 01 ";    //下一步开启RCO标定
-        emit sendSerialSignal(cmdStr);
-        m_speech->say(strMsg);
+            QString cmdStr = "5A 01 00 00 81 01 ";    //下一步开启RCO标定
+            emit sendSerialSignal(cmdStr);
+            m_speech->say(strMsg);
+        }else
+        {
+            QString strMsg = QStringLiteral("PLC已经到达位置")+QString::number(calibrationDistance)+"mm";
+            m_speech->say(strMsg);
+        }
+
     }
     else if("8180" == returnCmd )   // 初始化返回命令
     {
@@ -505,7 +513,6 @@ void MainWindow::AckCmd_MainWindow_slot(QString returnCmd,QString AckInfo)
         QString secondStr = QString("%1").arg((calibrationDistance+4)%100/10,2,10,QChar('0'));
         QString thirdStr = QString("%1").arg((calibrationDistance+4)%10,2,10,QChar('0'));
 
-
         cmdStr.append(firstStr);
         cmdStr.append(secondStr);
         cmdStr.append(thirdStr);
@@ -527,7 +534,7 @@ void MainWindow::AckCmd_MainWindow_slot(QString returnCmd,QString AckInfo)
     {
         if(calibration_model == offset_model)
         {
-            QString strMsg = QStringLiteral("断电重启命令已经完成 ，下一步发送下载测距固件1的命令!");
+            QString strMsg = QStringLiteral("断电重启命令已经完成,下一步发送下载测距固件1的命令!");
             Disploy_log(strMsg);
             m_speech->say(strMsg);
 
@@ -535,7 +542,23 @@ void MainWindow::AckCmd_MainWindow_slot(QString returnCmd,QString AckInfo)
             emit sendSerialSignal(cmdStr);
         }else if(calibration_model == test_model)
         {
-            QString strMsg = QStringLiteral("断电重启命令已经完成 ，下一步发送下载测距固件2的命令!");
+            QString strMsg = QStringLiteral("复测1模式下：断电重启命令已经完成,下一步发送下载测距固件2的命令!");
+            Disploy_log(strMsg);
+            m_speech->say(strMsg);
+
+            QString cmdStr = "5A 01 02 00 88 01";
+            emit sendSerialSignal(cmdStr);
+        }else if(calibration_model == test_2_model)
+        {
+            QString strMsg = QStringLiteral("复测2模式下：断电重启命令已经完成,下一步发送下载测距固件2的命令!");
+            Disploy_log(strMsg);
+            m_speech->say(strMsg);
+
+            QString cmdStr = "5A 01 02 00 88 01";
+            emit sendSerialSignal(cmdStr);
+        }else if(calibration_model == manual_test_model)
+        {
+            QString strMsg = QStringLiteral("手动复测模式下：断电重启命令已经完成,下一步发送下载测距固件2的命令!");
             Disploy_log(strMsg);
             m_speech->say(strMsg);
 
@@ -568,7 +591,7 @@ void MainWindow::AckCmd_MainWindow_slot(QString returnCmd,QString AckInfo)
             m_speech->say(strMsg);
 
             emit startGetStatisticData_signal(calibrationDistance);
-            m_speech->say(strMsg);
+
 
         }else                                        //失败
         {
@@ -683,6 +706,8 @@ void MainWindow::toSendStatistic_slot(int distance, vector<double> StatisticLSB_
         cmdStr.append(offsetStr);
         emit sendSerialSignal(cmdStr);
         ui->offset_10_label->setText(QString::number(offsetValue));
+        QString strMsg = QStringLiteral("下一步写入offset");
+        m_speech->say(strMsg);
 
 
 
@@ -713,7 +738,8 @@ void MainWindow::toSendStatistic_slot(int distance, vector<double> StatisticLSB_
         strList.clear();
         strList<<(QString::number(calibrationDistance)+QStringLiteral("mm脉宽"))<<QString::number(MaiKuan_mean);
         writeTocsv(saveFilelPath,strList);
-        strList<<(QString::number(calibrationDistance)+QStringLiteral("offset"))<<QString::number(offsetValue);
+        strList.clear();
+        strList<<(QStringLiteral("offset"))<<QString::number(offsetValue);
         writeTocsv(saveFilelPath,strList);
         strList.clear();
 
@@ -773,15 +799,18 @@ void MainWindow::toSendStatistic_slot(int distance, vector<double> StatisticLSB_
         ui->maikuan_50_label->setText(QString::number(MaiKuan_mean));
 
 
-
-
-        QString strMsg = QStringLiteral("自动标定测试已经完成");
-        Disploy_log(strMsg);
+        // 切换模式 ，并重新启动电源
+        calibration_model = test_2_model;
+        QString cmdStr = "5A 01 02 00 86 01";
+        emit sendSerialSignal(cmdStr);   //重新启动电源
+        QString strMsg = QStringLiteral("下一步断电重启的命令！");
         m_speech->say(strMsg);
 
 
+
+
         QStringList strList;
-        strList<<QStringLiteral("复测结果：");
+        strList<<QStringLiteral("复测结果1：");
         writeTocsv(saveFilelPath,strList);
         strList.clear();
         strList<<(QString::number(calibrationDistance)+QStringLiteral("mm复测均值"))<<QString::number(LSB_mean);
@@ -805,6 +834,143 @@ void MainWindow::toSendStatistic_slot(int distance, vector<double> StatisticLSB_
         strList<<(QString::number(calibrationDistance)+QStringLiteral("mm脉宽"))<<QString::number(MaiKuan_mean);
         writeTocsv(saveFilelPath,strList);
         strList.clear();
+
+
+
+
+    }else if(test_2_model == calibration_model)   //第二次复测的结果
+    {
+        //计算LSB的均值和方差
+        len = StatisticLSB_vector.size();
+        if(len<1)
+            return;
+
+        // 1 计算LSB的均值和方差
+        LSB_mean = std::accumulate(std::begin(StatisticLSB_vector),std::end(StatisticLSB_vector),0.0)/len;
+        float LSB_Accum = 0.0;
+        std::for_each(std::begin(StatisticLSB_vector),std::end(StatisticLSB_vector),[&](const double d){
+            LSB_Accum += (d-LSB_mean)*(d-LSB_mean);
+        });
+        LSB_std = sqrt(LSB_Accum/(len-1));
+
+        ui->mean_50_label_2->setText(QString::number(LSB_mean));
+        ui->std_50_label_2->setText(QString::number(LSB_std));
+
+
+        len = StatisticMM_vector.size();
+        if(len<1)
+            return;
+        MM_mean = std::accumulate(std::begin(StatisticMM_vector),std::end(StatisticMM_vector),0.0)/len;
+
+        float MM_Accum = 0.0;
+        std::for_each(std::begin(StatisticMM_vector),std::end(StatisticMM_vector),[&](const double d){
+            MM_Accum += (d-MM_mean)*(d-MM_mean);
+        });
+        MM_std = sqrt(MM_Accum/(len-1));
+
+        ui->alterMean_50_label_2->setText(QString::number(MM_mean));
+        ui->alterStd_50_label_2->setText(QString::number(MM_std));
+
+
+        len = StatisticPeak_vector.size();
+        if(len<1)
+            return;
+        float Peak_mean = std::accumulate(std::begin(StatisticPeak_vector),std::end(StatisticPeak_vector),0.0)/len;
+        ui->peakMean_50_label_2->setText(QString::number(Peak_mean));
+
+        //极差
+        float max_MM = *max_element(StatisticMM_vector.begin(),StatisticMM_vector.end());
+        float min_MM = *min_element(StatisticMM_vector.begin(),StatisticMM_vector.end());
+        float jicha_mm = max_MM - min_MM;
+        ui->jicha_50_label_2->setText(QString::number(jicha_mm));
+
+        // 脉宽
+        len = detectionRate_vector.size();
+        if(len<1)
+            return;
+        MaiKuan_mean = std::accumulate(std::begin(detectionRate_vector),std::end(detectionRate_vector),0.0)/len;
+        ui->maikuan_50_label_2->setText(QString::number(MaiKuan_mean));
+
+        QString strMsg = QStringLiteral("测试已经完成！");
+        m_speech->say(strMsg);
+
+        QStringList strList;
+        strList<<QStringLiteral("复测结果2：");
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+        strList<<(QString::number(calibrationDistance)+QStringLiteral("mm复测均值"))<<QString::number(LSB_mean);
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+        strList<<(QString::number(calibrationDistance)+QStringLiteral("mm复测方差"))<<QString::number(LSB_std);
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+        strList<<(QString::number(calibrationDistance)+QStringLiteral("mm修正均值"))<<QString::number(MM_mean);
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+        strList<<(QString::number(calibrationDistance)+QStringLiteral("mm修正方差"))<<QString::number(MM_std);
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+        strList<<(QString::number(calibrationDistance)+QStringLiteral("mm_peak均值"))<<QString::number(Peak_mean);
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+        strList<<(QString::number(calibrationDistance)+QStringLiteral("mm极差"))<<QString::number(jicha_mm);
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+        strList<<(QString::number(calibrationDistance)+QStringLiteral("mm脉宽"))<<QString::number(MaiKuan_mean);
+        writeTocsv(saveFilelPath,strList);
+        strList.clear();
+    }else if(manual_test_model == calibration_model)
+    {
+        //计算LSB的均值和方差
+        len = StatisticLSB_vector.size();
+        if(len<1)
+            return;
+
+        // 1 计算LSB的均值和方差
+        LSB_mean = std::accumulate(std::begin(StatisticLSB_vector),std::end(StatisticLSB_vector),0.0)/len;
+        float LSB_Accum = 0.0;
+        std::for_each(std::begin(StatisticLSB_vector),std::end(StatisticLSB_vector),[&](const double d){
+            LSB_Accum += (d-LSB_mean)*(d-LSB_mean);
+        });
+        LSB_std = sqrt(LSB_Accum/(len-1));
+
+        ui->mean_50_label->setText(QString::number(LSB_mean));
+        ui->std_50_label->setText(QString::number(LSB_std));
+
+
+        len = StatisticMM_vector.size();
+        if(len<1)
+            return;
+        MM_mean = std::accumulate(std::begin(StatisticMM_vector),std::end(StatisticMM_vector),0.0)/len;
+
+        float MM_Accum = 0.0;
+        std::for_each(std::begin(StatisticMM_vector),std::end(StatisticMM_vector),[&](const double d){
+            MM_Accum += (d-MM_mean)*(d-MM_mean);
+        });
+        MM_std = sqrt(MM_Accum/(len-1));
+
+        ui->alterMean_50_label->setText(QString::number(MM_mean));
+        ui->alterStd_50_label->setText(QString::number(MM_std));
+
+
+        len = StatisticPeak_vector.size();
+        if(len<1)
+            return;
+        float Peak_mean = std::accumulate(std::begin(StatisticPeak_vector),std::end(StatisticPeak_vector),0.0)/len;
+        ui->peakMean_50_label->setText(QString::number(Peak_mean));
+
+        //极差
+        float max_MM = *max_element(StatisticMM_vector.begin(),StatisticMM_vector.end());
+        float min_MM = *min_element(StatisticMM_vector.begin(),StatisticMM_vector.end());
+        float jicha_mm = max_MM - min_MM;
+        ui->jicha_50_label->setText(QString::number(jicha_mm));
+
+        // 脉宽
+        len = detectionRate_vector.size();
+        if(len<1)
+            return;
+        MaiKuan_mean = std::accumulate(std::begin(detectionRate_vector),std::end(detectionRate_vector),0.0)/len;
+        ui->maikuan_50_label->setText(QString::number(MaiKuan_mean));
     }
 }
 
@@ -861,6 +1027,11 @@ void MainWindow::on_startCalibration_pushButton_clicked()
     ui->peakMean_50_label->setText("");
     ui->jicha_50_label->setText("");
 
+    ui->maikuan_10_label->setText("");
+    ui->maikuan_50_label->setText("");
+    ui->alterMean_50_label_2->setText("");
+    ui->offset_10_label->setText("");
+
 
 
 
@@ -906,4 +1077,63 @@ void MainWindow::on_readModuleNum_pushButton_clicked()
 {
     QString cmdStr = "5A 00 03 00 85 00 00 ";
     emit sendSerialSignal(cmdStr);
+}
+
+//!
+//! \brief MainWindow::on_set_SteelDistance_pushButton_clicked
+//!设置导轨距离
+void MainWindow::on_set_SteelDistance_pushButton_clicked()
+{
+    calibration_model = manual_test_model;
+    int distance = ui->manualDistance_lineEdit->text().toInt();
+    QString cmdStr = "5A 01 00 00 71 ";
+    QString firstStr = QString("%1").arg((distance+4)/100,2,10,QChar('0'));
+    QString secondStr = QString("%1").arg((distance+4)%100/10,2,10,QChar('0'));
+    QString thirdStr = QString("%1").arg((distance+4)%10,2,10,QChar('0'));
+    cmdStr.append(firstStr);
+    cmdStr.append(secondStr);
+    cmdStr.append(thirdStr);
+    emit sendSerialSignal(cmdStr);
+
+
+    QString strMsg = QStringLiteral("发送设置导轨距离的命令");
+    m_speech->say(strMsg);
+
+}
+
+//!
+//! \brief MainWindow::on_manual_getData_pushButton_clicked
+//! 采集数据
+void MainWindow::on_manual_getData_pushButton_clicked()
+{
+    ui->RCO_lineEdit->clear();
+    ui->OTP_lineEdit_1->clear();
+    ui->OTP_lineEdit_2->clear();
+    ui->OTP_lineEdit_3->clear();
+    ui->OTP_lineEdit_4->clear();
+    ui->OTP_lineEdit_5->clear();
+    ui->OTP_lineEdit_6->clear();
+    ui->mean_10_label->setText("");
+    ui->std_10_label->setText("");
+    ui->alterMean_10_label->setText("");
+    ui->alterStd_10_label->setText("");
+    ui->peakMean_10_label->setText("");
+    ui->jicha_10_label->setText("");
+
+    ui->mean_50_label->setText("");
+    ui->std_50_label->setText("");
+    ui->alterMean_50_label->setText("");
+    ui->alterStd_50_label->setText("");
+    ui->peakMean_50_label->setText("");
+    ui->jicha_50_label->setText("");
+
+
+    calibration_model = manual_test_model;
+    QString cmdStr = "5A 01 02 00 86 01";
+    emit sendSerialSignal(cmdStr);
+
+    QString strMsg = QStringLiteral("发送电源重启的命令");
+    m_speech->say(strMsg);
+
+
 }

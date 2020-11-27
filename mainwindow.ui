@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>芯视界VI5300_v3.0_20201126</string>
+   <string>芯视界VI5300_v3.1_20201127</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -42,50 +42,14 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>279</width>
+          <width>232</width>
           <height>772</height>
          </rect>
         </property>
         <attribute name="label">
          <string/>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_5">
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="title">
-            <string>自动标定：</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="filePath_lineEdit"/>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>存储路径：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="moduleNum_lineEdit"/>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>模组编号：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0" colspan="2">
-             <widget class="QPushButton" name="startCalibration_pushButton">
-              <property name="text">
-               <string>开启自动标定</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
+        <layout class="QGridLayout" name="gridLayout_7" rowstretch="4,3,3,2">
          <item row="0" column="0">
           <widget class="QGroupBox" name="groupBox_3">
            <property name="styleSheet">
@@ -177,28 +141,61 @@
            </layout>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>自动标定：</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>存储路径：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="filePath_lineEdit"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>模组编号：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="moduleNum_lineEdit"/>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QPushButton" name="startCalibration_pushButton">
+              <property name="text">
+               <string>开启自动标定—&gt;测试</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QGroupBox" name="groupBox_4">
            <property name="title">
-            <string>自动测试：</string>
+            <string>手动测试：</string>
            </property>
-           <layout class="QGridLayout" name="gridLayout_7">
+           <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_20">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QLabel" name="label_27">
-                <property name="text">
-                 <string>产品计数：</string>
+               <widget class="QLineEdit" name="xuliehaoRes_lineEdit">
+                <property name="placeholderText">
+                 <string>芯片编号</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="productNum_label">
-                <property name="styleSheet">
-                 <string notr="true">font: 22pt &quot;黑体&quot;;</string>
-                </property>
+               <widget class="QPushButton" name="readModuleNum_pushButton">
                 <property name="text">
-                 <string>0</string>
+                 <string>读取芯片编号</string>
                 </property>
                </widget>
               </item>
@@ -207,46 +204,57 @@
             <item row="1" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_16">
               <item>
-               <widget class="QLabel" name="label_12">
-                <property name="text">
-                 <string>读取结果：</string>
+               <widget class="QLineEdit" name="manualDistance_lineEdit">
+                <property name="placeholderText">
+                 <string>距离：mm</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="xuliehaoRes_lineEdit"/>
+               <widget class="QPushButton" name="set_SteelDistance_pushButton">
+                <property name="text">
+                 <string>设置导轨距离</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
             <item row="2" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_17">
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="readModuleNum_pushButton">
-                <property name="text">
-                 <string>读取模组编号</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="3" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+             <widget class="QPushButton" name="manual_getData_pushButton">
+              <property name="text">
+               <string>采集数据</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
+         </item>
+         <item row="3" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_20">
+           <item>
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>产品计数：</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="productNum_label">
+             <property name="styleSheet">
+              <string notr="true">font: 22pt &quot;黑体&quot;;</string>
+             </property>
+             <property name="text">
+              <string>0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
