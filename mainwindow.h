@@ -40,6 +40,9 @@ public:
 
     //标定距离
     int  calibrationDistance;
+
+    //复测距离
+    int reTestDistance;
 private slots:
 
     void Disploy_log(QString);
@@ -85,6 +88,9 @@ private:
     QThread *receSerialThread;
     bool isLinked;   //是否连接的标识
     QString saveFilelPath;
+
+    // manual_保存相关
+    QString manualSaveFilePath;
 };
 
 #endif // MAINWINDOW_H

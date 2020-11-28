@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>芯视界VI5300_v3.1_20201127</string>
+   <string>芯视界VI5300_v3.3_20201128</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -42,14 +42,14 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>232</width>
+          <width>249</width>
           <height>772</height>
          </rect>
         </property>
         <attribute name="label">
          <string/>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_7" rowstretch="4,3,3,2">
+        <layout class="QGridLayout" name="gridLayout_14">
          <item row="0" column="0">
           <widget class="QGroupBox" name="groupBox_3">
            <property name="styleSheet">
@@ -180,7 +180,55 @@
          <item row="2" column="0">
           <widget class="QGroupBox" name="groupBox_4">
            <property name="title">
-            <string>手动测试：</string>
+            <string>手动复测(三次)：</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>存储路径</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="manualTest_savePath_lineEdit"/>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_29">
+              <item>
+               <widget class="QLabel" name="label_39">
+                <property name="text">
+                 <string>模组编号：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="manual_moduleNUm_label">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="2" column="0">
+             <widget class="QPushButton" name="manual_getData_pushButton">
+              <property name="text">
+               <string>开启测试</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QGroupBox" name="groupBox_10">
+           <property name="title">
+            <string>其他设置：</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
@@ -219,22 +267,15 @@
               </item>
              </layout>
             </item>
-            <item row="2" column="0">
-             <widget class="QPushButton" name="manual_getData_pushButton">
-              <property name="text">
-               <string>采集数据</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_20">
            <item>
             <widget class="QLabel" name="label_27">
              <property name="text">
-              <string>产品计数：</string>
+              <string>标定产品计数：</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

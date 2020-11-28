@@ -22,7 +22,10 @@ enum calibrationModel{
     offset_model,        //offset标定
     test_model,          //第一次复测
     test_2_model,        //第二次复测
-    manual_test_model    //手动测试
+    manual_test1_model,    //手动测试1
+    manual_test2_model,    //手动测试1
+    manual_test3_model,    //手动测试1
+    other_model
 };
 
 struct Settings {
